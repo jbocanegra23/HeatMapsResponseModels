@@ -10,7 +10,6 @@ library(readxl)
 library(dplyr)
 library(ggplot2)
 library(maps)
-library(ggmap)
 
 # First - I got the data from here: https://www6.sos.state.oh.us/ords/f?p=111:1:0::NO:RP:P1_TYPE:STATE
 df1 <- read.table("SWVF_1_44.txt", header = TRUE, sep = ",")
@@ -107,9 +106,10 @@ p2
 voter_data5$FULL_ADDRESS <- paste(voter_data5$RESIDENTIAL_ADDRESS1, voter_data5$RESIDENTIAL_CITY, voter_data5$RESIDENTIAL_STATE, sep = ", ")
 
 # Note without a paid subscription; I can only geocode 2,500 address per day, so let's look into a small town called Buckeye Lake
+
 voter_data6 <- voter_data5 %>% filter(RESIDENTIAL_CITY == "BUCKEYE LAKE")
 
-geocodes <- geocode(voter_data6$FULL_ADDRESS)
+geocodes <- geocode(voter_data6$FULL_ADDRESS) #This will take 10-15 minutes
 
 Buckeye_Lake_Map <- get_map(location = "Buckeye Lake", maptype = "roadmap", zoom = 14)
 
@@ -120,7 +120,7 @@ ggmap(Buckeye_Lake_Map) + geom_point(aes(x = lon, y = lat),
                                                         data = geocodes)
 
 # Nice! Notice the neighborhoods that don't have dots. 
-# It is important to note that 
+# Now for the heat / density map: drum roll please! 
 
 ggmap(Buckeye_Lake_Map) + geom_density2d(data = geocodes, 
                                         aes(x = lon, y = lat), size = 0.3) + 
@@ -130,5 +130,3 @@ ggmap(Buckeye_Lake_Map) + geom_density2d(data = geocodes,
 
 # Sweet! That's the good stuff right there.
 # Whelp that concludes this project.
-
-
