@@ -10,6 +10,7 @@ library(readxl)
 library(dplyr)
 library(ggplot2)
 library(maps)
+library(ggmap)
 
 # First - I got the data from here: https://www6.sos.state.oh.us/ords/f?p=111:1:0::NO:RP:P1_TYPE:STATE
 df1 <- read.table("SWVF_1_44.txt", header = TRUE, sep = ",")
@@ -71,7 +72,7 @@ names(map) <- c("long", "lat", "id")
 k <- ggplot(data1, aes(fill = Voters))
 p <- k + geom_map(aes(map_id = county), map = map) + 
                   expand_limits(x = map$long, y = map$lat)
-p
+p + ggtitle("Ohio - Total Independent Voters")
 
 # Nifty. Obviously the high dense areas are Franklin (Columbus), Cuyahoga (Cleveland) & Hamilton (Cincinnati)
 # Let's find out proportions
@@ -88,7 +89,7 @@ data2 <- data1 %>% left_join(Votes_2016_General, by = "county") %>%
 k2 <- ggplot(data2, aes(fill = Percent_Indep))
 p2 <- k2 + geom_map(aes(map_id = county), map = map) + 
   expand_limits(x = map$long, y = map$lat)
-p2
+p2 + ggtitle("Ohio - Proportion Independent Voters")
 
 # Tells a different Story. Again, nifty. Each county probably has a seperate rationale.
 # But if the job is to target specific group of independent voters within certain markets; 
@@ -117,7 +118,8 @@ ggmap(Buckeye_Lake_Map) + geom_point(aes(x = lon, y = lat),
                                                         colour = "red",
                                                         alpha = 0.1,
                                                         size = 2,
-                                                        data = geocodes)
+                                                        data = geocodes) + 
+                          ggtitle("Buckeye Lake - Independent Voters Location")
 
 # Nice! Notice the neighborhoods that don't have dots. 
 # Now for the heat / density map: drum roll please! 
@@ -126,7 +128,8 @@ ggmap(Buckeye_Lake_Map) + geom_density2d(data = geocodes,
                                         aes(x = lon, y = lat), size = 0.3) + 
                           stat_density2d(data = geocodes, aes(x = lon, y = lat, fill = ..level.., alpha = ..level..), size = 0.01, 
                                         bins = 16, geom = "polygon") + scale_fill_gradient(low = "green", high = "red") + 
-                          scale_alpha(range = c(0, 0.3), guide = FALSE)
+                          scale_alpha(range = c(0, 0.3), guide = FALSE) + 
+                          ggtitle("Buckeye Lake - Independent Voters")
 
 # Sweet! That's the good stuff right there.
 # Whelp that concludes this project.
